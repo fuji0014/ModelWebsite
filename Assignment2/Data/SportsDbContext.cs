@@ -25,9 +25,17 @@ namespace Assignment2.Data
                 .WithMany(s => s.Subscriptions)
                 .HasForeignKey(sub => sub.SportClubId);
 
+            modelBuilder.Entity<News>()
+                .HasKey(n => new { n.SportClubId });
+            modelBuilder.Entity<News>()
+                .HasOne(s => s.SportClub)
+                .WithMany(n => n.News)
+                .HasForeignKey(news => news.SportClubId);
+
             modelBuilder.Entity<Fan>().ToTable("Fan");
             modelBuilder.Entity<SportClub>().ToTable("SportClub");
             modelBuilder.Entity<Subscription>().ToTable("Subscription");
+            modelBuilder.Entity<News>().ToTable("News");
 
         }
 

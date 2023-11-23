@@ -25,7 +25,7 @@ namespace Assignment2.Controllers
         {
 
 
-            var viewModel = new NewsViewModel
+            var viewModel = new SportClubViewModel
             {
                 Fans = _context.Fans.ToList(),
                 SportClubs = _context.SportClubs.ToList(),

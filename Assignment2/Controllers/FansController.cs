@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Assignment2.Data;
 using Assignment2.Models;
+using Assignment2.Models.ViewModels;
 
 namespace Assignment2.Controllers
 {
@@ -20,9 +21,56 @@ namespace Assignment2.Controllers
         }
 
         // GET: Fans
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string Id)
         {
-              return View(await _context.Fans.ToListAsync());
+            /*
+            var fan = await _context.Fans.FindAsync(Id);
+
+            if (fan == null)
+            {
+                // Handle the scenario where the provided Id doesn't match any Fan
+                return NotFound();
+            }
+
+            // Fetching Subscriptions related to the Fan
+            var subscriptions = _context.Subscriptions
+                .Where(sub => sub.FanId == Id)
+                .Select(sub => new SportClubSubscriptionViewModel
+                {
+                    // Map properties from SportClubSubscription to SportClubSubscriptionViewModel
+                    SportClubId = sub.SportClubId,
+                    Title = sub.SportClub.Title, 
+                    //IsMember = sub.IsMember   //Need to make it a property?
+                })
+                .ToList();
+
+            var viewModel = new FanSubscriptionViewModel
+            {
+                Fan = fan,
+                Subscriptions = subscriptions
+            };
+            */
+
+            var viewModel = new SportClubViewModel
+            {
+                Fans = _context.Fans.ToList(),
+                SportClubs = _context.SportClubs.ToList(),
+                Subscriptions = _context.Subscriptions
+                    .Include(sub => sub.Fan)
+                    .Include(sub => sub.SportClub)
+                    .ToList()
+            };
+
+            if (Id != null)
+            {                
+                ViewBag.Id = Id;
+                viewModel.Subscriptions = viewModel.Fans.Where(
+                    x => x.Id.ToString().Contains(Id)).Single().Subscriptions;
+            }
+
+            //return View(await _context.SportClubs.ToListAsync());
+
+            return View(viewModel);
         }
 
         // GET: Fans/Details/5
