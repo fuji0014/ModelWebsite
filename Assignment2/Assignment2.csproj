@@ -20,9 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Models\ViewModels\" />
     <Folder Include="Pages\Shared\" />
-    <Folder Include="Views\Shared\" />
   </ItemGroup>
 
 </Project>
