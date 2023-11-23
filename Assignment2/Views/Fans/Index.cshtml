@@ -1,0 +1,88 @@
+﻿@model Assignment2.Models.ViewModels.SportClubViewModel
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                Last Name
+            </th>
+            <th>
+                First Name
+            </th>
+            <th>
+                Birth Date
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Fans) {
+        string selectedRow = "";
+        if (ViewBag.Id != null && item.Id.Equals(ViewBag.Id))
+        {
+            selectedRow = "success";
+        }
+
+        <tr class="@selectedRow">
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BirthDate)
+            </td>
+            <td>
+                <a asp-action="Index" asp-route-id="@item.Id">Select</a> |
+                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+
+@if (ViewBag.Id != null)
+{
+    <h3>
+        Member of the following SportClubs:
+    </h3>
+    <table class="table">
+
+        @if (Model.Subscriptions != null && Model.Subscriptions.Count() > 0)
+        {
+            <tr>
+                <th>
+                    Name
+                </th>
+            </tr>
+            @foreach (var item in Model.Subscriptions)
+            {
+                <tr>
+                    <td>
+                        @item.SportClub.Title
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <th> No subscription record exist </th>
+            </tr>
+        }
+
+
+
+    </table>
+}
