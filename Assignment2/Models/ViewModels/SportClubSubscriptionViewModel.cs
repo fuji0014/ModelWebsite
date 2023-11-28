@@ -1,4 +1,6 @@
-﻿namespace Assignment2.Models.ViewModels
+﻿using Assignment2.Data;
+
+namespace Assignment2.Models.ViewModels
 {
     public class SportClubSubscriptionViewModel
     {
