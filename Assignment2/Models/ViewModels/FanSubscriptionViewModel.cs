@@ -5,5 +5,7 @@
         public Fan Fan { get; set; }
         public IEnumerable<SportClubSubscriptionViewModel> Subscriptions { get; set; }
 
+        public IEnumerable<SportClub> SportClubs { get; set; }
+
     }
 }

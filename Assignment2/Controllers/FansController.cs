@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Assignment2.Data;
 using Assignment2.Models;
 using Assignment2.Models.ViewModels;
+using Microsoft.CodeAnalysis;
+using System.Diagnostics;
 
 namespace Assignment2.Controllers
 {
@@ -23,34 +25,6 @@ namespace Assignment2.Controllers
         // GET: Fans
         public async Task<IActionResult> Index(string Id)
         {
-            /*
-            var fan = await _context.Fans.FindAsync(Id);
-
-            if (fan == null)
-            {
-                // Handle the scenario where the provided Id doesn't match any Fan
-                return NotFound();
-            }
-
-            // Fetching Subscriptions related to the Fan
-            var subscriptions = _context.Subscriptions
-                .Where(sub => sub.FanId == Id)
-                .Select(sub => new SportClubSubscriptionViewModel
-                {
-                    // Map properties from SportClubSubscription to SportClubSubscriptionViewModel
-                    SportClubId = sub.SportClubId,
-                    Title = sub.SportClub.Title, 
-                    //IsMember = sub.IsMember   //Need to make it a property?
-                })
-                .ToList();
-
-            var viewModel = new FanSubscriptionViewModel
-            {
-                Fan = fan,
-                Subscriptions = subscriptions
-            };
-            */
-
             var viewModel = new SportClubViewModel
             {
                 Fans = _context.Fans.ToList(),
@@ -162,6 +136,110 @@ namespace Assignment2.Controllers
                 return RedirectToAction(nameof(Index));
             }
             return View(fan);
+        }
+
+        // GET: Fans/EditSubscriptions/5
+        public async Task<IActionResult> EditSubscriptions(int? id)
+        {
+           
+            var fan = await _context.Fans
+               .FirstOrDefaultAsync(f => f.Id == id);
+
+            if (fan == null)
+            {
+                return NotFound();
+            }
+
+            var subscriptions = await _context.SportClubs
+                .Select(club => new SportClubSubscriptionViewModel
+                {
+                    SportClubId = club.Id,
+                    Title = club.Title,
+                    IsMember = _context.Subscriptions.Any(s => s.FanId == id && s.SportClubId == club.Id)
+                })
+                .ToListAsync();
+
+            var viewModel = new FanSubscriptionViewModel
+            {
+                Fan = fan,
+                Subscriptions = subscriptions,
+                SportClubs = await _context.SportClubs.ToListAsync()
+            };
+
+            return View(viewModel);
+        }
+
+        // POST: Fans/EditSubscriptions/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditSubscriptions(int? id, [Bind("Id,LastName,FirstName,BirthDate")] Fan fan, string sportClubId)
+        {
+
+            //return RedirectToAction(nameof(Index));
+
+            if (id != fan.Id)
+            {
+                return NotFound();
+            }
+
+            if (sportClubId == null)
+            {
+                return NotFound();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(fan);
+                    await _context.SaveChangesAsync();
+
+                    var isMember = await _context.Subscriptions
+                        .AnyAsync(s => s.FanId == id && s.SportClubId == sportClubId);
+
+                    // Toggle membership status by registerting/unregistering subscription
+                    if (isMember)
+                    {
+                        // Remove subscription to indicate non-membership
+                        var subscriptionToRemove = await _context.Subscriptions
+                            .FirstOrDefaultAsync(s => s.FanId == id && s.SportClubId.Contains(sportClubId));
+                        Debug.Write("subscriptionToRemove: " + subscriptionToRemove);
+
+                        if (subscriptionToRemove != null)
+                        {
+                            _context.Subscriptions.Remove(subscriptionToRemove);
+                            await _context.SaveChangesAsync();
+                        }
+                    }
+                    else
+                    {
+                        // Add subscription to indicate membership
+                        _context.Subscriptions.Add(new Subscription
+                        {
+                            FanId = id.Value,
+                            SportClubId = sportClubId
+                        });
+
+                        await _context.SaveChangesAsync();
+                    }
+                    return RedirectToAction("EditSubscriptions", "Fans", new {id});
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!FanExists(fan.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+
+            }
+            return View(fan);           
         }
 
         // GET: Fans/Delete/5
