@@ -18,15 +18,15 @@
             @Html.DisplayFor(model => model.FileName)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.SportClub)
+            @Html.DisplayNameFor(model => model.Url)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.SportClub.Id)
+            <img src="@Model.Url" alt="@Model.FileName" style="max-width: 400px" />
         </dd>
     </dl>
 
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="SportClubId" />
+    <form asp-action="Delete" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="submit" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
