@@ -12,7 +12,7 @@ namespace Assignment2.Data
         public DbSet<SportClub> SportClubs { get; set; }
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<News> News { get; set; }
- 
+        
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Subscription>()
@@ -27,7 +27,7 @@ namespace Assignment2.Data
                 .HasForeignKey(sub => sub.SportClubId);
 
             modelBuilder.Entity<News>()
-                .HasKey(n => new { n.SportClubId });
+                .HasKey(n => new { n.Id });
             modelBuilder.Entity<News>()
                 .HasOne(s => s.SportClub)
                 .WithMany(n => n.News)
