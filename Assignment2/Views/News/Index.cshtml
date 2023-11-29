@@ -34,7 +34,7 @@
                         @Html.DisplayFor(modelItem => item.FileName)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Url)
+                        <img src="@item.Url" alt="@item.FileName" style="max-width: 400px" />
                     </td>
                     <td>
                         <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
