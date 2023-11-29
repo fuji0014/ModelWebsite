@@ -1,0 +1,52 @@
+﻿@model Assignment2.Models.ViewModels.NewsViewModel
+
+@{
+    ViewData["Title"] = "News";
+}
+
+<h1>Show news for @Model.SportClub.Title</h1>
+
+<p>
+    <a asp-action="Create" asp-route-id="@Model.SportClub.Id">Upload News</a>
+</p>
+<p>
+    <a asp-action="Index" asp-controller="SportClubs">Back to List</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                File Name
+            </th>
+            <th>
+                Image
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Model.News != null && Model.News.Count() > 0)
+        {
+            foreach (var item in Model.News)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FileName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Url)
+                    </td>
+                    <td>
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        }
+        else
+        {
+            <tr>
+                <th> No News record exist </th>
+            </tr>
+        }
+    </tbody>
+</table>
