@@ -7,93 +7,59 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Assignment2.Data;
 using Assignment2.Models;
+using Assignment2.Models.ViewModels;
+using Azure.Storage.Blobs;
 
 namespace Assignment2.Controllers
 {
     public class NewsController : Controller
     {
         private readonly SportsDbContext _context;
+        private readonly BlobServiceClient _blobServiceClient;
 
-        public NewsController(SportsDbContext context)
+        public NewsController(SportsDbContext context, BlobServiceClient blobServiceClient)
         {
             _context = context;
+            _blobServiceClient = blobServiceClient;
         }
 
         // GET: News
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(String id)
         {
-            var sportsDbContext = _context.News.Include(n => n.SportClub);
-            return View(await sportsDbContext.ToListAsync());
+            var newsModel = new NewsViewModel
+            {
+                SportClub = await _context.SportClubs.FindAsync(id),
+                News = await _context.News.Where(n => n.SportClubId == id).ToListAsync()
+            };
+
+            return View(newsModel);
         }
 
-        // GET: News/Details/5
-        public async Task<IActionResult> Details(string id)
+        // GET: News/Create/A1
+        public async Task<IActionResult> Create(String id)
         {
-            if (id == null || _context.News == null)
+            var sportClub = await _context.SportClubs.FindAsync(id);
+            if (sportClub == null)
             {
                 return NotFound();
             }
-
-            var news = await _context.News
-                .Include(n => n.SportClub)
-                .FirstOrDefaultAsync(m => m.SportClubId == id);
-            if (news == null)
+            var fileInput = new FileInputViewModel
             {
-                return NotFound();
-            }
+                SportClubId = sportClub.Id,
+                SportClubTitle = sportClub.Title,
+            };
 
-            return View(news);
+            return View(fileInput);
         }
 
-        // GET: News/Create
-        public IActionResult Create()
-        {
-            ViewData["SportClubId"] = new SelectList(_context.SportClubs, "Id", "Id");
-            return View();
-        }
-
-        // POST: News/Create
+        // POST: News/Create/A1
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("SportClubId,FileName")] News news)
+        public async Task<IActionResult> Create(String id, [Bind("SportClubId,File")] News news)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Add(news);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["SportClubId"] = new SelectList(_context.SportClubs, "Id", "Id", news.SportClubId);
-            return View(news);
-        }
-
-        // GET: News/Edit/5
-        public async Task<IActionResult> Edit(string id)
-        {
-            if (id == null || _context.News == null)
-            {
-                return NotFound();
-            }
-
-            var news = await _context.News.FindAsync(id);
-            if (news == null)
-            {
-                return NotFound();
-            }
-            ViewData["SportClubId"] = new SelectList(_context.SportClubs, "Id", "Id", news.SportClubId);
-            return View(news);
-        }
-
-        // POST: News/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, [Bind("SportClubId,FileName")] News news)
-        {
-            if (id != news.SportClubId)
+            if (!id.Equals(news.SportClubId.ToString()))
             {
                 return NotFound();
             }
@@ -102,24 +68,40 @@ namespace Assignment2.Controllers
             {
                 try
                 {
-                    _context.Update(news);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!NewsExists(news.SportClubId))
+                    if (news.File != null && news.File.Length > 0)
                     {
-                        return NotFound();
+                        news.SportClub = await _context.SportClubs.FindAsync(id);
+                        var containerName = news.SportClub.Title;
+                        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+                        await containerClient.CreateIfNotExistsAsync();
+
+                        //random file name
+                        news.FileName = Path.GetRandomFileName();
+
+                        var blobClient = containerClient.GetBlobClient(news.FileName);
+                        using (var stream = news.File.OpenReadStream())
+                        {
+                            await blobClient.UploadAsync(stream, true);
+                        }
+
+                        news.Url = blobClient.Uri.ToString();
                     }
                     else
                     {
-                        throw;
+                        // Handle the case where the news or news.File is null
+                        return RedirectToAction("Create", "News", new { id });  //Error
                     }
+                    _context.Add(news);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction("Index", "News", new { id });
                 }
-                return RedirectToAction(nameof(Index));
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
             }
-            ViewData["SportClubId"] = new SelectList(_context.SportClubs, "Id", "Id", news.SportClubId);
-            return View(news);
+
+            return RedirectToAction("Create", "News", new { id });
         }
 
         // GET: News/Delete/5
