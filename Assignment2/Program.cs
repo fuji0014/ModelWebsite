@@ -1,4 +1,5 @@
 using Assignment2.Data;
+using Azure.Storage.Blobs;
 using Microsoft.EntityFrameworkCore;
 
 namespace Assignment2
@@ -13,6 +14,10 @@ namespace Assignment2
             builder.Services.AddControllersWithViews();
             var connection = builder.Configuration.GetConnectionString("DefaultConnection");
             builder.Services.AddDbContext<SportsDbContext>(options => options.UseSqlServer(connection));
+
+            var blobConnection = builder.Configuration.GetConnectionString("AzureBlobStorage");
+            builder.Services.AddSingleton(new BlobServiceClient(blobConnection));
+
             builder.Services.AddSession();
             var app = builder.Build();
 
