@@ -6,6 +6,9 @@ a.navbar-brand {
     text-align: center;
     word-break: break-all;
 }
+.a2-navbar {
+    background-color: dimgrey;
+}
 
 /* Provide sufficient contrast against white background */
 a {
