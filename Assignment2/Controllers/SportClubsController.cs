@@ -153,7 +153,13 @@ namespace Assignment2.Controllers
                 return NotFound();
             }
 
-            return View(sportClub);
+            var newsModel = new NewsViewModel
+            {
+                SportClub = sportClub,
+                News = await _context.News.Where(n => n.SportClubId == id).ToListAsync(),
+            };
+
+            return View(newsModel);
         }
 
         // POST: SportClubs/Delete/5
