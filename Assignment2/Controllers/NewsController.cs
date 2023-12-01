@@ -105,7 +105,7 @@ namespace Assignment2.Controllers
         }
 
         // GET: News/Delete/5
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.News == null)
             {
@@ -114,7 +114,7 @@ namespace Assignment2.Controllers
 
             var news = await _context.News
                 .Include(n => n.SportClub)
-                .FirstOrDefaultAsync(m => m.SportClubId == id);
+                .FirstOrDefaultAsync(m => m.Id.Equals(id));
             if (news == null)
             {
                 return NotFound();
@@ -124,27 +124,44 @@ namespace Assignment2.Controllers
         }
 
         // POST: News/Delete/5
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(string id)
+        public async Task<IActionResult> Delete(int? id, [Bind("Id, SportClubId, FileName")] News news)
         {
-            if (_context.News == null)
+            if (id == null)
             {
-                return Problem("Entity set 'SportsDbContext.News'  is null.");
-            }
-            var news = await _context.News.FindAsync(id);
-            if (news != null)
-            {
-                _context.News.Remove(news);
+                return NotFound();
             }
 
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    var sportclub = await _context.SportClubs.FindAsync(news.SportClubId);
 
-        private bool NewsExists(string id)
-        {
-            return _context.News.Any(e => e.SportClubId == id);
+                    if (news != null)
+                    {
+                        var containerName = sportclub.Title;
+                        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+
+                        if (containerClient != null)
+                        {
+                            var blobClient = containerClient.GetBlobClient(news.FileName);
+                            await blobClient.DeleteIfExistsAsync();
+                        }
+                        _context.Remove(news);
+                        await _context.SaveChangesAsync();
+                    }
+
+                    return RedirectToAction("Index", "News", new { sportclub.Id });
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    throw;
+                }
+            }
+
+            return RedirectToAction("Delete", "News", new { id });
         }
     }
 }

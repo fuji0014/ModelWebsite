@@ -1,7 +1,8 @@
-﻿@model SportClub
+﻿@model Assignment2.Models.ViewModels.NewsViewModel
 
 @{
     ViewData["Title"] = "Delete";
+    var btnDisabled = false;
 }
 
 <h1>Delete</h1>
@@ -12,22 +13,32 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Title)
+            @Html.DisplayNameFor(model => model.SportClub.Title)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Title)
+            @Html.DisplayFor(model => model.SportClub.Title)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Fee)
+            @Html.DisplayNameFor(model => model.SportClub.Fee)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Fee)
+            @Html.DisplayFor(model => model.SportClub.Fee)
         </dd>
+        @if (@Model.News.Count() > 0)
+        {
+            <dd class="col-sm-10">
+                <strong style="font-size: 20px; color: #800020"><br /><u>NOTE:</u> Please delete all News before deleting the Sport Club</strong>
+            </dd>
+        }
     </dl>
 
     <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
+        <input type="hidden" asp-for="SportClub.Id" />
+        @if (Model.News.Count() > 0)
+        {
+            btnDisabled = true;
+        }
+        <input type="submit" disabled="@btnDisabled" value="Delete" class="btn btn-danger" /> |
         <a asp-action="Index">Back to List</a>
     </form>
 </div>

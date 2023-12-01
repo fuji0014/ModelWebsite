@@ -27,7 +27,10 @@
 
     <form asp-action="Delete" method="post">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="SportClubId" />
+        <input type="hidden" asp-for="FileName" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index" asp-route-id="SportClubId">Back to List</a>
     </form>
 </div>
