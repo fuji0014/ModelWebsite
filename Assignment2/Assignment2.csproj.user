@@ -14,5 +14,6 @@
     <WebStackScaffolding_DbContextTypeFullName>Assignment2.Data.SportsDbContext</WebStackScaffolding_DbContextTypeFullName>
     <WebStackScaffolding_IsAsyncSelected>False</WebStackScaffolding_IsAsyncSelected>
     <WebStackScaffolding_IsViewGenerationSelected>True</WebStackScaffolding_IsViewGenerationSelected>
+    <NameOfLastUsedPublishProfile>C:\Users\phuon\OneDrive - Algonquin College\.NET\CST8359_Assignment2\Assignment2\Properties\PublishProfiles\amyeriassignment2 - Web Deploy.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
 </Project>

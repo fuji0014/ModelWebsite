@@ -1,0 +1,20 @@
+{
+  "dependencies": {
+    "mssql1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/amyeriassignment2/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsDefaultConnection_F4842AEE35",
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/erileserver/databases/assignment2",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:DefaultConnection",
+      "dynamicId": null
+    },
+    "storage1": {
+      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/amyeriassignment2/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsAzureBlobStorage_7092885A35, /subscriptions/d43e2f17-fef4-445f-a098-9217b6d5bf50/resourceGroups/erilabnet/providers/Microsoft.Web/sites/amyeriassignment2/providers/Microsoft.ServiceLinker/linkers/ConnectionStringsAzureBlobStorage_343079BDE3",
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/erileassignment2",
+      "type": "storage.azure",
+      "connectionId": "ConnectionStrings:AzureBlobStorage",
+      "dynamicId": null
+    }
+  }
+}
