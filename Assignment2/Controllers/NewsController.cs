@@ -68,12 +68,12 @@ namespace Assignment2.Controllers
             {
                 try
                 {
+                    BlobContainerClient containerClient;
                     if (news.File != null && news.File.Length > 0)
                     {
                         news.SportClub = await _context.SportClubs.FindAsync(id);
                         var containerName = news.SportClub.Title;
-                        var containerClient = _blobServiceClient.GetBlobContainerClient(containerName.ToLower());
-                        await containerClient.CreateIfNotExistsAsync();
+                        containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName.ToLower(), Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
 
                         //random file name
                         news.FileName = Path.GetRandomFileName();
