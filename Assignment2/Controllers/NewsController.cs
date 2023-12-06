@@ -9,6 +9,7 @@ using Assignment2.Data;
 using Assignment2.Models;
 using Assignment2.Models.ViewModels;
 using Azure.Storage.Blobs;
+using Azure;
 
 namespace Assignment2.Controllers
 {
@@ -73,8 +74,13 @@ namespace Assignment2.Controllers
                     {
                         news.SportClub = await _context.SportClubs.FindAsync(id);
                         var containerName = news.SportClub.Title;
-                        containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName.ToLower(), Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
-
+                        try
+                        {
+                            containerClient = await _blobServiceClient.CreateBlobContainerAsync(containerName.ToLower(), Azure.Storage.Blobs.Models.PublicAccessType.BlobContainer);
+                        } catch (RequestFailedException e)
+                        {
+                            containerClient = _blobServiceClient.GetBlobContainerClient(containerName.ToLower());
+                        }
                         //random file name
                         news.FileName = Path.GetRandomFileName();
 
