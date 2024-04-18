@@ -1,6 +1,6 @@
 # Project Title
 
-This project is a website for Assignment 2 for CST8359 class
+Model Website
 
 ## Table of Contents
 
